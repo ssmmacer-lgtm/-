@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي الذكاء - لعبة أسئلة وأجوبة</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- جزيئات الخلفية -->
+<div class="particles" id="particles"></div>
+
+<!-- نمط الخلفية -->
+<div class="background-pattern"></div>
+
+<!-- اللعبة الرئيسية -->
+<div class="game-wrapper">
+    
+    <!-- شاشة البداية -->
+    <div class="screen home-screen" id="homeScreen">
+        <div class="game-container">
+            <div class="header-premium">
+                <div class="logo-icon">🧠</div>
+                <h1 class="title-main">تحدي الذكاء</h1>
+                <p class="subtitle">لعبة أسئلة وأجوبة مثيرة</p>
+            </div>
+
+            <div class="stats-showcase">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalGames">0</div>
+                    <div class="stat-label">ألعاب</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="highScore">0</div>
+                    <div class="stat-label">أعلى نقطة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgScore">0</div>
+                    <div class="stat-label">المتوسط</div>
+                </div>
+            </div>
+
+            <div class="mode-selection">
+                <h2 class="section-title">اختر المستوى</h2>
+                <div class="mode-grid">
+                    <button class="mode-btn easy-mode" onclick="startGame('easy')">
+                        <span class="mode-icon">🟢</span>
+                        <span class="mode-name">سهل</span>
+                        <span class="mode-desc">بداية لطيفة</span>
+                    </button>
+                    <button class="mode-btn medium-mode" onclick="startGame('medium')">
+                        <span class="mode-icon">🟡</span>
+                        <span class="mode-name">متوسط</span>
+                        <span class="mode-desc">تحدي حقيقي</span>
+                    </button>
+                    <button class="mode-btn hard-mode" onclick="startGame('hard')">
+                        <span class="mode-icon">🔴</span>
+                        <span class="mode-name">صعب</span>
+                        <span class="mode-desc">للخبراء فقط</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="category-selection">
+                <h2 class="section-title">اختر الفئة (اختياري)</h2>
+                <div class="category-grid">
+                    <button class="category-btn" data-category="الكل" onclick="setCategory('الكل')">الكل</button>
+                    <button class="category-btn" data-category="جغرافيا" onclick="setCategory('جغرافيا')">جغرافيا</button>
+                    <button class="category-btn" data-category="تاريخ" onclick="setCategory('تاريخ')">تاريخ</button>
+                    <button class="category-btn" data-category="علوم" onclick="setCategory('علوم')">علوم</button>
+                    <button class="category-btn" data-category="ثقافة" onclick="setCategory('ثقافة')">ثقافة</button>
+                    <button class="category-btn" data-category="دين" onclick="setCategory('دين')">دين</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" id="startBtn" onclick="beginGame()" disabled>
+                <span class="btn-icon">▶</span>
+                <span class="btn-text">ابدأ اللعبة</span>
+            </button>
+
+            <div class="footer-text">
+                © 2025 تحدي الذكاء | جميع الحقوق محفوظة
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة اللعبة -->
+    <div class="screen game-screen" id="gameScreen" style="display:none;">
+        <div class="game-container">
+            
+            <!-- الرأسية الحية -->
+            <div class="game-header">
+                <button class="btn-close" onclick="quitGame()">✕</button>
+                <div class="header-info">
+                    <div class="mode-badge" id="modeBadge">سهل</div>
+                    <div class="category-badge" id="categoryBadge">الكل</div>
+                </div>
+            </div>
+
+            <!-- شريط التقدم والنقاط -->
+            <div class="game-stats">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span>التقدم</span>
+                        <span class="progress-text" id="progressText">0/20</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="points-section">
+                    <div class="points-display">
+                        <span class="points-label">النقاط:</span>
+                        <span class="points-value" id="scoreDisplay">0</span>
+                    </div>
+                    <div class="streak-display">
+                        <span class="streak-label">السلسلة:</span>
+                        <span class="streak-value" id="streakDisplay">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة السؤال -->
+            <div class="question-section">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">1/20</span>
+                    <span class="question-difficulty" id="difficultyIcon">🟢</span>
+                </div>
+                <div class="question-card">
+                    <p class="question-text" id="questionText">جاري تحميل السؤال...</p>
+                </div>
+                <p class="hint-text" id="hintText"></p>
+            </div>
+
+            <!-- حقل الإدخال والأزرار -->
+            <div class="answer-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="answerInput" 
+                        placeholder="اكتب إجابتك هنا..." 
+                        autocomplete="off"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">
+                        <span>تحقق</span>
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-hint" id="hintBtn" onclick="useHint()">
+                        <span class="btn-icon">💡</span>
+                        <span class="btn-text">تلميح</span>
+                        <span class="hint-count" id="hintCount">3</span>
+                    </button>
+                    <button class="btn btn-skip" onclick="skipQuestion()">
+                        <span class="btn-icon">⏭</span>
+                        <span class="btn-text">تجاوز</span>
+                    </button>
+                </div>
+
+                <div class="result-message" id="resultMsg"></div>
+            </div>
+
+            <!-- زر التالي -->
+            <button class="btn btn-next btn-hidden" id="nextBtn" onclick="nextQuestion()">
+                <span class="btn-icon">→</span>
+                <span class="btn-text">السؤال التالي</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- شاشة النهاية -->
+    <div class="screen end-screen" id="endScreen" style="display:none;">
+        <div class="game-container">
+            <div class="end-content">
+                <div class="trophy-container">
+                    <div class="trophy" id="trophyIcon">👑</div>
+                </div>
+
+                <h2 class="end-title">انتهت اللعبة!</h2>
+
+                <div class="final-stats">
+                    <div class="final-score-section">
+                        <div class="final-score" id="finalScore">0</div>
+                        <div class="score-label">النقاط</div>
+                    </div>
+                    <div class="final-stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="finalCorrect">0</div>
+                            <div class="stat-name">صحيحة</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="finalWrong">0</div>
+                            <div class="stat-name">خاطئة</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="finalAccuracy">0%</div>
+                            <div class="stat-name">النسبة</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stars-container">
+                    <div class="stars" id="starsDisplay">⭐</div>
+                </div>
+
+                <p class="end-message" id="endMessage">رائع! أداء جيد.</p>
+
+                <div class="end-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="returnHome()">
+                        <span class="btn-icon">🏠</span>
+                        <span class="btn-text">العودة للبداية</span>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="restartGame()">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">لعبة أخرى</span>
+                    </button>
+                </div>
+
+                <div class="share-section">
+                    <p class="share-text">شارك نتيجتك:</p>
+                    <button class="btn btn-share" onclick="shareScore()">📱 شارك</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
